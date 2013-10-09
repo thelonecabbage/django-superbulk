@@ -39,5 +39,29 @@ Django app/view that adds the ability to execute many requests inside of a singl
 	      'X-CSRFToken': (document.cookie.match(/csrftoken=([0-9a-zA-Z]*)/) || ['']).pop()
 	   }
 	});
-
 ```
+##django urls.py:
+Add this url (or any other you prefer) to your urls.py file.
+```python
+   urlpatterns = patterns(
+      url(r'^api/superbulk/', superbulk, name='superbulk-api'),
+   )
+```
+
+##return result:
+Errors in any of the items will result in the entire operation failing (Atomic Transactions).
+Successfull returns return an array of objects in the same order and length submitted.
+```javascript
+[{
+   status_code: 201,
+   headers: {...},
+   content: ''
+},
+{
+   status_code: 201,
+   headers: {...},
+   content: ''
+}]
+```
+
+
