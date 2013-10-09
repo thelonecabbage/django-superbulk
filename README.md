@@ -1,7 +1,18 @@
 djang-superbulk
 ===============
 
-Django app/view that adds the ability to execute many requests inside of a single HTTP connection
+Django app/view that adds the ability to execute many requests inside of a single HTTP connection.  django-superbulk is compatible with tastypie, django-REST or any other django based view system.
+
+###WHY?
+**Transactions! Transactions! Transactions!** The major reason is to be able to commit REST operations transactionally.  Tastypie allows bulk operations on a single resource, but not accross multiple resources. Superbulk inherits Djano's transactional operations.  All of the requests succed or they all fail (and roll back).
+
+**Performance** is another issue.  While not generally critical some applications can benefit from this. Such as bulk write of a large number of items, or fetching diverse data on bootstrap from networked devices with a high lag time (mobile phones?).
+
+###Security:
+Django-superbulk passes on security to the views, where it is handled normally.  No request can be made using superbulk that the user can't make otherwise.
+
+###IE8:
+Older browsers don't support all of HTTP's new verbs (PATCH is not supported by IE8 and lower).  Since requests are wrapped in a POST request, this problem can be solved by using superbulk.
 
 ##example client:
 * __data__ is sent as an array of objects, with three fields (always).
@@ -47,7 +58,6 @@ Add this url (or any other you prefer) to your urls.py file.
       url(r'^api/superbulk/', superbulk, name='superbulk-api'),
    )
 ```
-
 ##return result:
 Errors in any of the items will result in the entire operation failing (Atomic Transactions).
 Successfull returns return an array of objects in the same order and length submitted.
