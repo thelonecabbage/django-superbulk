@@ -21,4 +21,15 @@ data = [{
       })
    }
 ]
+
+$.ajax({
+   url: '/api/superbulk/',
+   dataType: "application/json",
+   data: JSON.stringify(data),
+   type:'POST',
+   contentType:'application/json',
+   headers: {
+      'X-CSRFToken': (document.cookie.match(/csrftoken=([0-9a-zA-Z]*)/) || ['']).pop()
+   }
+});
 ```
