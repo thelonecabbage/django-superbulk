@@ -6,10 +6,19 @@ Django app/view that adds the ability to execute many requests inside of a singl
 example usage:
  ```javascript
 data = [{
-  method:'GET',
-uri:'/api/internal/v1/invoice/',
-body:JSON.stringify({
-  slug: '1231'
-})}
+   method:'POST',
+   uri:'/api/v1/customer/',
+   body:JSON.stringify({
+      id: 'asdf-asdf-asdf-sadf',
+      name: 'Justin'
+      })
+   },{
+   method:'POST',
+   uri:'/api/v1/invoice/',
+   body:JSON.stringify({
+      customer_id: 'asdf-asdf-asdf-sadf',
+      invoice_no: '0001'
+      })
+   }
 ]
 ```
