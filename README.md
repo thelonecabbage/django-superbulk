@@ -3,7 +3,9 @@ djang-superbulk
 
 Django app/view that adds the ability to execute many requests inside of a single HTTP connection
 
-example usage:
+##example client:
+"data" is sent as an array of objects, with three fields (always).  "method" is GET, POST, PATCH, UPDATE, DELETE, or any other HTTP verb you use.  "uri" is the absolute path (not including http and domain) to your django-view.  "body" is always a string, but can contain any data, as here a serialized JSON object.
+
  ```javascript
 data = [{
    method:'POST',
