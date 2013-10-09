@@ -9,6 +9,7 @@ Django app/view that adds the ability to execute many requests inside of a singl
 * "__uri__" is the absolute path (not including http and domain) to your django-view.
 * "__body__" is always a string, but can contain any data, as here a serialized JSON object.
 
+
  ```javascript
 data = [{
    method:'POST',
