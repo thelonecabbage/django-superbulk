@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import json
 from copy import copy
 
@@ -14,7 +16,6 @@ def superbulk(request):
         view, args, kwargs = resolve(data['uri'])
         this_request = copy(request)
 
-        #this_request._body = encoder.encode(data['body'])
         this_request._body = data['body']
         this_request.method = data['method']
         kwargs['request'] = this_request
