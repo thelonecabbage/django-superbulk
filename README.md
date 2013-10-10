@@ -1,4 +1,4 @@
-djang-superbulk
+django-superbulk
 ===============
 
 Django app/view that adds the ability to execute many requests inside of a single HTTP connection.  django-superbulk is compatible with tastypie, django-REST or any other django based view system.
@@ -18,7 +18,7 @@ Older browsers don't support all of HTTP's new verbs (PATCH is not supported by 
 * __data__ is sent as an array of objects, with three fields (always).
 * __method__ is GET, POST, PATCH, UPDATE, DELETE, or any other HTTP verb you use.
 * __uri__ is the absolute path (not including http and domain) to your django-view.
-* __body__ is always a string, but can contain any data, as here a serialized JSON object.
+* __body__ is always a string, but may contain any data. Here it is a serialized JSON object.
 
 
  ```javascript
