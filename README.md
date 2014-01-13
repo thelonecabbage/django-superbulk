@@ -51,13 +51,23 @@ Older browsers don't support all of HTTP's new verbs (PATCH is not supported by 
 	   }
 	});
 ```
-##django urls.py:
+## Installing:
+
+#TODO: replace this with pip install after proposal
+```
+git clone git@github.com:thelonecabbage/django-superbulk.git
+cd django-superbulk
+python setup.py install
+```
+
 Add this url (or any other you prefer) to your urls.py file.
 ```python
+   from django_superbulk import superbulk
    urlpatterns = patterns(
       url(r'^api/superbulk/', superbulk, name='superbulk-api'),
    )
 ```
+
 ##return result:
 Errors in any of the items will result in the entire operation failing (Atomic Transactions).
 Successfull returns return an array of objects in the same order and length submitted.
