@@ -53,8 +53,8 @@ Older browsers don't support all of HTTP's new verbs (PATCH is not supported by 
 ```
 ## Installing:
 
-#TODO: replace this with pip install after proposal
 ```
+#TODO: Replace this with pip instructions when available in pipy
 git clone git@github.com:thelonecabbage/django-superbulk.git
 cd django-superbulk
 python setup.py install
