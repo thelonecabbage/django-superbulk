@@ -8,3 +8,7 @@ from django.http import HttpResponse, Http404, HttpResponseNotFound, HttpRespons
 from django.core.urlresolvers import resolve
 from models import Invoice, Customer
 import sys
+
+
+def superbulk(request):
+    return HttpResponse("Hello")
