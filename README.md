@@ -62,9 +62,8 @@ python setup.py install
 
 Add this url (or any other you prefer) to your urls.py file.
 ```python
-   from django_superbulk import superbulk
-   urlpatterns = patterns(
-      url(r'^api/superbulk/', superbulk, name='superbulk-api'),
+   urlpatterns += patterns('django_superbulk'
+      url(r'^api/superbulk/$', 'superbulk'),
    )
 ```
 
