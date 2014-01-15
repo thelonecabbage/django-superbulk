@@ -64,6 +64,12 @@ Add this url (or any other you prefer) to your urls.py file.
 ```python
    urlpatterns += patterns('django_superbulk'
       url(r'^api/superbulk/$', 'superbulk'),
+      # this is the url for the more permissive
+      # handling where some transactions may fail but this
+      # returns a list with the results of the execution
+
+      url(r'^api/superbulk_transactional/$', 'superbulk-atomic'),
+      # this will handle all the post data as a single transaction
    )
 ```
 
@@ -83,4 +89,12 @@ Successfull returns return an array of objects in the same order and length subm
 }]
 ```
 
+Tests:
+    In order to run the tests you will need nose and lettuce.
+
+    They can be run with the usual:
+
+    ```
+        cd superbulk_test && python manage.py harvest
+    ```
 
