@@ -9,13 +9,13 @@ from django.shortcuts import render
 
 import json
 from copy import copy
-from django.db import transaction, IntegrityError
+from django.db import transaction, IntegrityError, connection
 from django.http import HttpResponse, Http404, HttpResponseNotFound, HttpResponseServerError
 from django.core.urlresolvers import resolve
-from models import Invoice, Customer
+from atomic_test.models import Customer, Invoice
 import sys
 
-@transaction.set_autocommit(False)
+@transaction.set_autocommit(False) #, connection('db.sqlite3'))
 def superbulk_transactional(request):
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
