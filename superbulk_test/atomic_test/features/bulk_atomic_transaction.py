@@ -21,9 +21,10 @@ def post_data(step, url):
 
 @step(r'both inserts are inside the database')
 def inserts_worked(step):
+    # from nose.tools import set_trace;set_trace()
     data = json.loads(world.response_data)
     for data_object in data:
-        dom = html.fromstring(data_object['content'])
+        dom = json.loads(data_object['content'])
         if dom['obj_type'] == 'customer':
             customer_id = dom['id']
             customer_name = dom['name']
@@ -47,11 +48,11 @@ def post_data(step, url):
 
 @step(r'transaction failed atomically')
 def inserts_failed(step):
+    # from nose.tools import set_trace; set_trace()
     data = json.loads(world.response_data)
     overall_success = True
-    from nose.tools import set_trace; set_trace()
     for data_object in data:
-        if int(data['status_code']) < 400:
+        if data['result'] == 'ok':
             overall_success = overall_success and True
         else:
             overall_success = overall_success and False

@@ -20,7 +20,7 @@ def superbulk_transactional(request):
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
-    from nose.tools import set_trace; set_trace()
+    # from nose.tools import set_trace; set_trace()
     transaction.atomic(True)
     try:
         # with transaction.atomic:
