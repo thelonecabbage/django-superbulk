@@ -1,6 +1,9 @@
-from lettuce import *
-from django.test.client import Client
 import json
+from nose.tools import eq_, ok_
+
+from django.test.client import Client
+from lettuce import *
+
 from atomic_test.models import Customer, Invoice
 
 def clean_db():
@@ -46,10 +49,7 @@ def inserts_failed(step):
         if temp['obj_type'] == 'invoice':
             customer_id = temp['customer_id']
             invoice_no = temp['invoice_no']
-            temp_obj = Invoice.objects.get(customer_id=customer_id, invoice_no=invoice_no)
-            assert temp_obj is None
+            ok_(not Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
         else:
-            customer_id = temp['id']
-            customer_name = temp['name']
-            temp_obj = Customer.objects.get(id=customer_id, name=customer_name)
-            assert temp_obj is None
+            ok_(not Customer.objects.filter(id=temp['id'], name=temp['name']))
+
