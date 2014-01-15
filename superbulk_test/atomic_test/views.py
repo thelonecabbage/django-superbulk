@@ -9,18 +9,17 @@ from django.shortcuts import render
 
 import json
 from copy import copy
-from django.db import transaction, IntegrityError, connection
-from django.http import HttpResponse, Http404, HttpResponseNotFound, HttpResponseServerError
+from django.db import transaction, IntegrityError
+from django.http import HttpResponse
 from django.core.urlresolvers import resolve
 from atomic_test.models import Customer, Invoice
 import sys
 
-# @transaction.set_autocommit(False) #, connection('db.sqlite3'))
+@transaction.commit_on_success
 def superbulk_transactional(request):
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
-    transaction.atomic()
     try:
         # with transaction.atomic:
         for data in data_list:
@@ -43,12 +42,8 @@ def superbulk_transactional(request):
             })
 
     except IntegrityError:
-        transaction.rollback()
         return HttpResponse(content=encoder.encode(res_list),
                             status=500)
-    finally:
-        transaction.atomic(False)
-    transaction.commit()
     return HttpResponse(
         encoder.encode(res_list), content_type='application/json')
 
@@ -91,14 +86,7 @@ def invoice(request):
         return HttpResponse(content=http_response,
                             status=200)
     except Exception as e:
-        http_response = json.dumps({
-            'result': 'fail',
-            'obj_type': 'invoice',
-            'customer_id': None, #data['customer_id'],
-            'invoice_no': None, #data['invoice_no']
-            'reason': e.message
-        })
-        return HttpResponse(content=http_response, status=500)
+        raise IntegrityError
 
 def customer(request):
     data = json.loads(request.body)
@@ -115,12 +103,4 @@ def customer(request):
         return HttpResponse(content=http_response,
                             status=200)
     except Exception as e:
-        http_response = json.dumps({
-            'result': 'fail',
-            'obj_type': 'customer',
-            'id': None, #data['customer_id'],
-            'name': None, #data['invoice_no']
-            'reason': e.message
-        })
-        return HttpResponse(content=http_response,
-                            status=500)
+        raise IntegrityError
