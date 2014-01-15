@@ -2,22 +2,26 @@ from __future__ import absolute_import
 
 import json
 from copy import copy
+from urlparse import urlparse
 
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.core.urlresolvers import resolve
 
 
 def superbulk(request):
+    """A (django)view which executes multiple views in the same request."""
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
 
     for data in data_list:
-        view, args, kwargs = resolve(data['uri'])
+        uri = urlparse(data['uri'])
+        view, args, kwargs = resolve(uri.path)
         this_request = copy(request)
 
         this_request._body = data['body']
         this_request.method = data['method']
+        this_request.GET = QueryDict(uri.query)
         kwargs['request'] = this_request
 
         res = view(*args, **kwargs)
