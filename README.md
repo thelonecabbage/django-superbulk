@@ -58,6 +58,11 @@ Older browsers don't support all of HTTP's new verbs (PATCH is not supported by 
 git clone git@github.com:thelonecabbage/django-superbulk.git
 cd django-superbulk
 python setup.py install
+
+or another option would be to:
+
+pip install git+https://github.com/thelonecabbage/django-superbulk.git
+(Note the https form)
 ```
 
 Add this url (or any other you prefer) to your urls.py file.
