@@ -13,7 +13,6 @@ from django.db import transaction, IntegrityError
 from django.http import HttpResponse
 from django.core.urlresolvers import resolve
 from atomic_test.models import Customer, Invoice
-import sys
 
 @transaction.commit_on_success
 def superbulk_transactional(request):
@@ -21,7 +20,6 @@ def superbulk_transactional(request):
     data_list = json.loads(request.body)
     res_list = []
     try:
-        # with transaction.atomic:
         for data in data_list:
             view, args, kwargs = resolve(data['uri'])
             this_request = copy(request)
@@ -61,7 +59,7 @@ def superbulk(request):
         kwargs['request'] = this_request
         try:
             res = view(*args, **kwargs)
-        except Exception as e:
+        except Exception:
             pass
         res_list.append({
             'status_code': res.status_code,
