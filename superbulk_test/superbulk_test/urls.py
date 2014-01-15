@@ -12,6 +12,6 @@ urlpatterns = patterns('',
     url(r'^api/superbulk/', 'views.superbulk', name='superbulk-api'),
     url(r'^api/superbulk_transactional/', 'superbulk_transactional',
         name='superbulk-api-atomic'),
-    url(r'^api/v1/invoice/', 'invoice', name='invoice'),
-    url(r'^api/v1/customer/', 'customer', name='customer')
+    url(r'^api/v1/invoice/', 'views.invoice', name='invoice'),
+    url(r'^api/v1/customer/', 'views.customer', name='customer')
 )
