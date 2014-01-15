@@ -64,7 +64,6 @@ def superbulk(request):
         this_request._body = data['body']
         this_request.method = data['method']
         kwargs['request'] = this_request
-        # from nose.tools import set_trace; set_trace()
         try:
             res = view(*args, **kwargs)
         except Exception as e:
