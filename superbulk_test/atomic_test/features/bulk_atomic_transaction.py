@@ -1,7 +1,5 @@
 from lettuce import *
-from lxml import html
 from django.test.client import Client
-from nose.tools import assert_equals
 import json
 from atomic_test.models import Customer, Invoice
 
@@ -40,25 +38,11 @@ def inserts_worked(step):
             temp_obj = Invoice.objects.get(customer_id=customer_id, invoice_no=invoice_no)
             assert temp_obj is not None
 
-
-@step(r'the post data is "(.*)"')
-def access_url(step, data):
-    world.post_data = data
-
-@step(r'I post the data to "(.*)"')
-def post_data(step, url):
-    response = world.browser.post(url, world.post_data, content_type='application/json')
-    world.response_data = response.content
-
 @step(r'transaction failed atomically')
 def inserts_failed(step):
-    from nose.tools import set_trace; set_trace()
     data = json.loads(world.response_data)
-
-    overall_success = True
-    valid = []
     for data_object in data:
-        temp = json.loads(data['content'])
+        temp = json.loads(data_object['content'])
         if temp['obj_type'] == 'invoice':
             customer_id = temp['customer_id']
             invoice_no = temp['invoice_no']
