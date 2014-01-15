@@ -4,8 +4,14 @@ from django.test.client import Client
 from nose.tools import assert_equals
 import json
 from atomic_test.models import Customer, Invoice
+
+def clean_db():
+    Customer.objects.all().delete()
+    Invoice.objects.all().delete()
+
 @before.all
 def set_browser():
+    clean_db()
     world.browser = Client()
 
 @step(r'the post data is "(.*)"')

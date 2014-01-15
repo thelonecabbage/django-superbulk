@@ -20,8 +20,7 @@ def superbulk_transactional(request):
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
-    # from nose.tools import set_trace; set_trace()
-    transaction.atomic(True)
+    transaction.atomic()
     try:
         # with transaction.atomic:
         for data in data_list:
@@ -104,7 +103,6 @@ def invoice(request):
         return HttpResponse(content=http_response, status=500)
 
 def customer(request):
-    # from nose.tools import set_trace; set_trace()
     data = json.loads(request.body)
     try:
         test_customer = Customer(data['id'], data['name'])
