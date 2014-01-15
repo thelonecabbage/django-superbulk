@@ -44,7 +44,7 @@ def superbulk_transactional(request):
 
     except IntegrityError:
         transaction.rollback()
-        return HttpResponse(content=json.dumps({'result': 'fail'}),
+        return HttpResponse(content=encoder.encode(res_list),
                             status=500)
     finally:
         transaction.atomic(False)
@@ -67,8 +67,7 @@ def superbulk(request):
         try:
             res = view(*args, **kwargs)
         except Exception as e:
-            print e.message
-            sys.exit(1)
+            pass
         res_list.append({
             'status_code': res.status_code,
             'headers': res._headers,

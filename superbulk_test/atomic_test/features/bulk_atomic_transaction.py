@@ -54,23 +54,18 @@ def post_data(step, url):
 def inserts_failed(step):
     from nose.tools import set_trace; set_trace()
     data = json.loads(world.response_data)
+
     overall_success = True
     valid = []
     for data_object in data:
-        if data['result'] == 'ok':
-            overall_success = overall_success and True
-            valid.append(data)
+        temp = json.loads(data['content'])
+        if temp['obj_type'] == 'invoice':
+            customer_id = temp['customer_id']
+            invoice_no = temp['invoice_no']
+            temp_obj = Invoice.objects.get(customer_id=customer_id, invoice_no=invoice_no)
+            assert temp_obj is None
         else:
-            overall_success = overall_success and False
-    if not overall_success:
-        for k in valid:
-            if k['obj_type'] == 'invoice':
-                customer_id = k['customer_id']
-                invoice_no = k['invoice_no']
-                temp_obj = Invoice.objects.get(customer_id=customer_id, invoice_no=invoice_no)
-                assert temp_obj is None
-            else:
-                customer_id = k['id']
-                customer_name = k['name']
-                temp_obj = Customer.objects.get(id=customer_id, name=customer_name)
-                assert temp_obj is None
+            customer_id = temp['id']
+            customer_name = temp['name']
+            temp_obj = Customer.objects.get(id=customer_id, name=customer_name)
+            assert temp_obj is None
