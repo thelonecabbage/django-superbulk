@@ -1,54 +1,31 @@
 from __future__ import absolute_import
+from copy import copy
+import json
+import sys
+
+from django.core.urlresolvers import resolve
+from django.db import transaction, IntegrityError, connection
+from django.http import HttpResponse, Http404, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render
 
-# Create your views here.
-# response json is in the form:
-# { 'result' : ['ok'|'fail'],
-#     'obj_type' : ['invoice'|'customer'],
-#     'obj_attr1' : [value] .....}
-
-import json
-from copy import copy
-from django.db import transaction, IntegrityError
-from django.http import HttpResponse
-from django.core.urlresolvers import resolve
 from atomic_test.models import Customer, Invoice
 
-@transaction.commit_on_success
+class MultipleHTTPError(Exception):
+    """ """
+
 def superbulk_transactional(request):
-    encoder = json.JSONEncoder()
-    data_list = json.loads(request.body)
-    res_list = []
+    """ """
     try:
-        for data in data_list:
-            view, args, kwargs = resolve(data['uri'])
-            this_request = copy(request)
-
-            this_request._body = data['body']
-            this_request.method = data['method']
-            kwargs['request'] = this_request
-            try:
-                res = view(*args, **kwargs)
-            except Exception:
-                raise IntegrityError
-            if res.status_code >= 400:
-                raise IntegrityError
-            res_list.append({
-                'status_code': res.status_code,
-                'headers': res._headers,
-                'content': res.content
-            })
-
-    except IntegrityError:
-        return HttpResponse(content=encoder.encode(res_list),
-                            status=500)
-    return HttpResponse(
-        encoder.encode(res_list), content_type='application/json')
+        with transaction.commit_on_success():
+            return superbulk(request)
+    except MultipleHTTPError as e:
+        return HttpResponse(str(e), content_type='application/json')
 
 def superbulk(request):
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
+    one_failed = False
 
     for data in data_list:
         view, args, kwargs = resolve(data['uri'])
@@ -57,16 +34,17 @@ def superbulk(request):
         this_request._body = data['body']
         this_request.method = data['method']
         kwargs['request'] = this_request
-        try:
-            res = view(*args, **kwargs)
-        except Exception:
-            pass
+        res = view(*args, **kwargs)
+        if res.status_code >= 400:
+            one_failed = True
         res_list.append({
             'status_code': res.status_code,
             'headers': res._headers,
             'content': res.content
         })
 
+    if one_failed:
+        raise MultipleHTTPError(json.dumps(res_list))
     return HttpResponse(
         encoder.encode(res_list), content_type='application/json')
 
@@ -84,7 +62,14 @@ def invoice(request):
         return HttpResponse(content=http_response,
                             status=200)
     except Exception as e:
-        raise IntegrityError
+        http_response = json.dumps({
+            'result': 'fail',
+            'obj_type': 'invoice',
+            'customer_id': None, #data['customer_id'],
+            'invoice_no': None, #data['invoice_no']
+            'reason': e.message
+        })
+        return HttpResponse(content=http_response, status=500)
 
 def customer(request):
     data = json.loads(request.body)
@@ -101,4 +86,12 @@ def customer(request):
         return HttpResponse(content=http_response,
                             status=200)
     except Exception as e:
-        raise IntegrityError
+        http_response = json.dumps({
+            'result': 'fail',
+            'obj_type': 'customer',
+            'id': None, #data['customer_id'],
+            'name': None, #data['invoice_no']
+            'reason': e.message
+        })
+        return HttpResponse(content=http_response,
+                            status=500)
