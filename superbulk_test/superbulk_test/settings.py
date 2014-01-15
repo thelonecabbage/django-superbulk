@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 import sys
-sys.path.append(os.path.join(BASE_DIR, '/atomic_test/'))
+sys.path.append(os.path.join(BASE_DIR, 'atomic_test'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
