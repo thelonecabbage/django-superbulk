@@ -17,11 +17,11 @@ def superbulk_transactional(request):
     """ """
     try:
         with transaction.commit_on_success():
-            return superbulk(request)
+            return superbulk_atom(request)
     except MultipleHTTPError as e:
         return HttpResponse(str(e), content_type='application/json')
 
-def superbulk(request):
+def superbulk_atom(request):
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
@@ -34,7 +34,10 @@ def superbulk(request):
         this_request._body = data['body']
         this_request.method = data['method']
         kwargs['request'] = this_request
-        res = view(*args, **kwargs)
+        try:
+            res = view(*args, **kwargs)
+        except:
+            one_failed = True
         if res.status_code >= 400:
             one_failed = True
         res_list.append({
@@ -47,6 +50,32 @@ def superbulk(request):
         raise MultipleHTTPError(json.dumps(res_list))
     return HttpResponse(
         encoder.encode(res_list), content_type='application/json')
+
+def superbulk(request):
+    encoder = json.JSONEncoder()
+    data_list = json.loads(request.body)
+    res_list = []
+
+    for data in data_list:
+        view, args, kwargs = resolve(data['uri'])
+        this_request = copy(request)
+
+        this_request._body = data['body']
+        this_request.method = data['method']
+        kwargs['request'] = this_request
+        try:
+            res = view(*args, **kwargs)
+        except:
+            pass
+        res_list.append({
+            'status_code': res.status_code,
+            'headers': res._headers,
+            'content': res.content
+        })
+
+    return HttpResponse(
+        encoder.encode(res_list), content_type='application/json')
+
 
 def invoice(request):
     data = json.loads(request.body)

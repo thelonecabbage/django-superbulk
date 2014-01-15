@@ -33,13 +33,11 @@ def inserts_worked(step):
         if dom['obj_type'] == 'customer':
             customer_id = dom['id']
             customer_name = dom['name']
-            temp_obj = Customer.objects.get(id=customer_id, name=customer_name)
-            assert temp_obj is not None
+            ok_(Customer.objects.filter(id=customer_id, name=customer_name))
         else:
             customer_id = dom['customer_id']
             invoice_no = dom['invoice_no']
-            temp_obj = Invoice.objects.get(customer_id=customer_id, invoice_no=invoice_no)
-            assert temp_obj is not None
+            ok_(Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
 
 @step(r'transaction failed atomically')
 def inserts_failed(step):
