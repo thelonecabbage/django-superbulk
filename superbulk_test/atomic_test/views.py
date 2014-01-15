@@ -15,13 +15,13 @@ from django.core.urlresolvers import resolve
 from atomic_test.models import Customer, Invoice
 import sys
 
-@transaction.set_autocommit(False) #, connection('db.sqlite3'))
+# @transaction.set_autocommit(False) #, connection('db.sqlite3'))
 def superbulk_transactional(request):
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
     from nose.tools import set_trace; set_trace()
-    # transaction.atomic(True)
+    transaction.atomic(True)
     try:
         # with transaction.atomic:
         for data in data_list:
@@ -42,12 +42,14 @@ def superbulk_transactional(request):
                 'headers': res._headers,
                 'content': res.content
             })
-            transaction.commit()
+
     except IntegrityError:
         transaction.rollback()
-        return HttpResponse(content="<h1>Transaction failed</h1>",
-                            status=200)
-
+        return HttpResponse(content=json.dumps({'result': 'fail'}),
+                            status=500)
+    finally:
+        transaction.atomic(False)
+    transaction.commit()
     return HttpResponse(
         encoder.encode(res_list), content_type='application/json')
 
