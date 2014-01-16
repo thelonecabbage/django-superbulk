@@ -4,10 +4,9 @@ from nose.tools import eq_, ok_
 from django.test.client import Client
 from lettuce import *
 
-from atomic_test.models import Customer, Invoice
+from atomic_test.models import Invoice
 
 def clean_db():
-    Customer.objects.all().delete()
     Invoice.objects.all().delete()
 
 @before.all
@@ -30,26 +29,18 @@ def inserts_worked(step):
     data = json.loads(world.response_data)
     for data_object in data:
         dom = json.loads(data_object['content'])
-        if dom['obj_type'] == 'customer':
-            customer_id = dom['id']
-            customer_name = dom['name']
-            ok_(Customer.objects.filter(id=customer_id, name=customer_name))
-        else:
-            customer_id = dom['customer_id']
-            invoice_no = dom['invoice_no']
-            ok_(Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
+        customer_id = dom['customer_id']
+        invoice_no = dom['invoice_no']
+        ok_(Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
 
 @step(r'transaction failed atomically')
 def inserts_failed(step):
     data = json.loads(world.response_data)
     for data_object in data:
         temp = json.loads(data_object['content'])
-        if temp['obj_type'] == 'invoice':
-            customer_id = temp['customer_id']
-            invoice_no = temp['invoice_no']
-            ok_(not Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
-        else:
-            ok_(not Customer.objects.filter(id=temp['id'], name=temp['name']))
+        customer_id = temp['customer_id']
+        invoice_no = temp['invoice_no']
+        ok_(not Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
 
 @step(r'transaction stops after first failure')
 def insert_failed_break(step):

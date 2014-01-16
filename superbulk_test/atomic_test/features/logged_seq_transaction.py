@@ -1,10 +1,10 @@
 from lettuce import *
 from django.test.client import Client
 import json
-from atomic_test.models import Customer, Invoice
+
+from atomic_test.models import Invoice
 
 def clean_db():
-    Customer.objects.all().delete()
     Invoice.objects.all().delete()
 
 @before.all
@@ -28,9 +28,9 @@ def inserts_worked_as_expected(step):
         dom = json.loads(data_object['content'])
         statuscode = data_object['status_code']
         if int(statuscode) < 400:
-            customer_id = dom['id']
-            customer_name = dom['name']
-            temp_obj = Customer.objects.get(id=customer_id, name=customer_name)
+            customer_id = dom['customer_id']
+            invoice_no = dom['invoice_no']
+            temp_obj = Invoice.objects.get(customer_id=customer_id, invoice_no=invoice_no)
             assert temp_obj is not None
         elif int(statuscode) >= 400:
             err_message = dom['result']
