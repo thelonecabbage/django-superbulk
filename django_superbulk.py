@@ -35,14 +35,54 @@ def failfast_jsonloads(body):
 
     """
     data = json.loads(body)
-    if type(data) == list:
-        return False, json.loads(body)
-    elif type(data) == dict:
-        if 'failfast' in data.keys():
-            if data['failfast'] == 'True':
-                return True, data['content']
-            else:
-                return False, data['content']
+    if isinstance(data, list):
+        failfast = False
+    elif isinstance(data, dict):
+        failfast = data.get('failfast', False)
+        data = data['content']
+    else:
+        raise NotImplementedError("Individual requests have body "
+                                  "of unsupported json type(other than list and dict)")
+    return failfast, data
+
+
+def request_handler(request, data_list, failfast=False):
+    """Handles a list of requests in json form
+
+    params: request: Passed in from the view that calls
+                    the method
+            data_list: list of the json form requests
+            failfast: bool var that determines if this
+                     will fail on first error
+    return
+
+    """
+    res_list = []
+    one_failed = False
+    for data in data_list:
+        if failfast and one_failed:
+            break
+        uri = urlparse(data['uri'])
+        view, args, kwargs = resolve(uri.path)
+        this_request = copy(request)
+        this_request._body = data['body']
+        this_request.method = data['method']
+        this_request.GET = QueryDict(uri.query)
+        kwargs['request'] = this_request
+        try:
+            res = view(*args, **kwargs)
+        except:
+            one_failed = True
+        if res.status_code >= 400:
+            one_failed = True
+        res_list.append({
+            'status_code': res.status_code,
+            'headers': res._headers,
+            'content': res.content
+        })
+    return one_failed, res_list
+
+
 
 
 def superbulk_atom(request):
@@ -53,37 +93,13 @@ def superbulk_atom(request):
     """
     encoder = json.JSONEncoder()
     failfast, data_list = failfast_jsonloads(request.body)
-    res_list = []
-    one_failed = False
-    for data in data_list:
-        uri = urlparse(data['uri'])
-        view, args, kwargs = resolve(uri.path)
-        this_request = copy(request)
-
-        this_request._body = data['body']
-        this_request.method = data['method']
-        this_request.GET = QueryDict(uri.query)
-        kwargs['request'] = this_request
-        try:
-            res = view(*args, **kwargs)
-        except:
-            one_failed = True
-            if failfast:
-                break
-        if res.status_code >= 400:
-            one_failed = True
-            if failfast:
-                break
-        res_list.append({
-            'status_code': res.status_code,
-            'headers': res._headers,
-            'content': res.content
-        })
-
+    one_failed, res_list = request_handler(request, data_list, failfast=failfast)
     if one_failed:
-        raise MultipleHTTPError(json.dumps(res_list))
+        raise MultipleHTTPError(encoder.encode(res_list))
     return HttpResponse(
         encoder.encode(res_list), content_type='application/json')
+
+
 
 def superbulk(request):
     """Performs multiple transactions passed in
@@ -95,26 +111,6 @@ def superbulk(request):
     """
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
-    res_list = []
-
-    for data in data_list:
-        uri = urlparse(data['uri'])
-        view, args, kwargs = resolve(uri.path)
-        this_request = copy(request)
-
-        this_request._body = data['body']
-        this_request.method = data['method']
-        this_request.GET = QueryDict(uri.query)
-        kwargs['request'] = this_request
-        try:
-            res = view(*args, **kwargs)
-        except:
-            pass
-        res_list.append({
-            'status_code': res.status_code,
-            'headers': res._headers,
-            'content': res.content
-        })
-
+    one_failed, res_list = request_handler(request, data_list)
     return HttpResponse(
         encoder.encode(res_list), content_type='application/json')

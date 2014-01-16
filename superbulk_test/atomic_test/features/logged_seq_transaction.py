@@ -1,27 +1,26 @@
 from lettuce import *
 from django.test.client import Client
 import json
+from nose.tools import eq_, ok_
 
 from atomic_test.models import Invoice
+from utils import clean_db
 
-def clean_db():
-    Invoice.objects.all().delete()
+from utils import before_all, set_post_data, make_request
 
 @before.all
 def set_browser():
-    clean_db()
-    world.browser = Client()
+    before_all()
 
 @step(r'the post data is "(.*)"')
 def access_url(step, data):
-    world.post_data = data
+    set_post_data(data)
 
 @step(r'I post the data to "(.*)"')
 def post_data(step, url):
-    response = world.browser.post(url, world.post_data, content_type='application/json')
-    world.response_data = response.content
+    make_request(url, world.post_data)
 
-@step(r'everything worked fine with logging')
+@step(r'all individual responses have correct format')
 def inserts_worked_as_expected(step):
     data = json.loads(world.response_data)
     for data_object in data:
@@ -30,8 +29,7 @@ def inserts_worked_as_expected(step):
         if int(statuscode) < 400:
             customer_id = dom['customer_id']
             invoice_no = dom['invoice_no']
-            temp_obj = Invoice.objects.get(customer_id=customer_id, invoice_no=invoice_no)
-            assert temp_obj is not None
+            ok_(Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
         elif int(statuscode) >= 400:
-            err_message = dom['result']
-            assert err_message == 'fail'
+            err_message = dom['customer_id']
+            assert err_message == None

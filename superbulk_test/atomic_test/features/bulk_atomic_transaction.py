@@ -1,27 +1,23 @@
 import json
 from nose.tools import eq_, ok_
 
-from django.test.client import Client
 from lettuce import *
 
-from atomic_test.models import Invoice
 
-def clean_db():
-    Invoice.objects.all().delete()
+from atomic_test.models import Invoice
+from utils import before_all, set_post_data, make_request
 
 @before.all
 def set_browser():
-    clean_db()
-    world.browser = Client()
+    before_all()
 
 @step(r'the post data is "(.*)"')
 def access_url(step, data):
-    world.post_data = data
+    set_post_data(data)
 
 @step(r'I post the data to "(.*)"')
 def post_data(step, url):
-    response = world.browser.post(url, world.post_data, content_type='application/json')
-    world.response_data = response.content
+    make_request(url, world.post_data)
 
 
 @step(r'both inserts are inside the database')
@@ -45,4 +41,4 @@ def inserts_failed(step):
 @step(r'transaction stops after first failure')
 def insert_failed_break(step):
     data = json.loads(world.response_data)
-    assert len(data) == 1
+    assert len(data) == 2

@@ -16,12 +16,16 @@ def invoice(request):
     """
 
     data = json.loads(request.body)
-    test_invoice = Invoice(data['customer_id'], data['invoice_no'])
     try:
+        test_invoice = Invoice(data['customer_id'], data['invoice_no'])
         test_invoice.save()
         http_response = model_to_dict(test_invoice)
         code = 200
     except Exception as e:
-        http_response['reason'] = e.message
+        http_response = {
+            'customer_id': None,
+            'invoice_no': None,
+            'reason': e.message
+        }
         code = 500
     return HttpResponse(content=json.dumps(http_response), status=code)
