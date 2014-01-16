@@ -1,10 +1,11 @@
 from __future__ import absolute_import
 from copy import copy
 import json
+from urlparse import urlparse
 
 from django.core.urlresolvers import resolve
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 
 class MultipleHTTPError(Exception):
     """Raised when transaction fails
@@ -55,11 +56,13 @@ def superbulk_atom(request):
     res_list = []
     one_failed = False
     for data in data_list:
-        view, args, kwargs = resolve(data['uri'])
+        uri = urlparse(data['uri'])
+        view, args, kwargs = resolve(uri.path)
         this_request = copy(request)
 
         this_request._body = data['body']
         this_request.method = data['method']
+        this_request.GET = QueryDict(uri.query)
         kwargs['request'] = this_request
         try:
             res = view(*args, **kwargs)
@@ -95,11 +98,13 @@ def superbulk(request):
     res_list = []
 
     for data in data_list:
-        view, args, kwargs = resolve(data['uri'])
+        uri = urlparse(data['uri'])
+        view, args, kwargs = resolve(uri.path)
         this_request = copy(request)
 
         this_request._body = data['body']
         this_request.method = data['method']
+        this_request.GET = QueryDict(uri.query)
         kwargs['request'] = this_request
         try:
             res = view(*args, **kwargs)
