@@ -51,3 +51,7 @@ def inserts_failed(step):
         else:
             ok_(not Customer.objects.filter(id=temp['id'], name=temp['name']))
 
+@step(r'transaction stops after first failure')
+def insert_failed_break(step):
+    data = json.loads(world.response_data)
+    assert len(data) == 1

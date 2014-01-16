@@ -21,12 +21,23 @@ def superbulk_transactional(request):
     except MultipleHTTPError as e:
         return HttpResponse(str(e), content_type='application/json')
 
+def failfast_jsonloads(body):
+    data = json.loads(body)
+    if type(data) == list:
+        return False, json.loads(body)
+    elif type(data) == dict:
+        if 'failfast' in data.keys():
+            if data['failfast'] == 'True':
+                return True, data['content']
+            else:
+                return False, data['content']
+
+
 def superbulk_atom(request):
     encoder = json.JSONEncoder()
-    data_list = json.loads(request.body)
+    failfast, data_list = failfast_jsonloads(request.body)
     res_list = []
     one_failed = False
-
     for data in data_list:
         view, args, kwargs = resolve(data['uri'])
         this_request = copy(request)
@@ -38,8 +49,12 @@ def superbulk_atom(request):
             res = view(*args, **kwargs)
         except:
             one_failed = True
+            if failfast:
+                break
         if res.status_code >= 400:
             one_failed = True
+            if failfast:
+                break
         res_list.append({
             'status_code': res.status_code,
             'headers': res._headers,
