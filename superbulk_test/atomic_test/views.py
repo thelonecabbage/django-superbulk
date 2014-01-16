@@ -21,10 +21,7 @@ def invoice(request):
         test_invoice.save()
         http_response = model_to_dict(test_invoice)
         code = 200
-        return HttpResponse(content=json.dumps(http_response),
-                            status=code)
     except Exception as e:
-        http_response = model_to_dict(test_invoice)
         http_response['reason'] = e.message
         code = 500
-        return HttpResponse(content=json.dumps(http_response), status=code)
+    return HttpResponse(content=json.dumps(http_response), status=code)
