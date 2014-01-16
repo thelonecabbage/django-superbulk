@@ -31,5 +31,5 @@ def inserts_worked_as_expected(step):
             invoice_no = dom['invoice_no']
             ok_(Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
         elif int(statuscode) >= 400:
-            err_message = dom['customer_id']
-            assert err_message == None
+            err_message = dom['reason']
+            assert err_message is not None

@@ -23,8 +23,6 @@ def invoice(request):
         code = 200
     except Exception as e:
         http_response = {
-            'customer_id': None,
-            'invoice_no': None,
             'reason': e.message
         }
         code = 500
