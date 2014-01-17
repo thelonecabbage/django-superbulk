@@ -49,12 +49,13 @@ def failfast_jsonloads(body):
 def request_handler(request, data_list, failfast=False):
     """Handles a list of requests in json form
 
-    params: request: Passed in from the view that calls
+    @params: request: Passed in from the view that calls
                     the method
             data_list: list of the json form requests
             failfast: bool var that determines if this
                      will fail on first error
-    return
+    @return: bool : if one transaction failed
+            list : list of request responses
 
     """
     res_list = []
@@ -90,6 +91,7 @@ def superbulk_atom(request):
 
     @return: json encoded response
     @raises: MultipleHttpError
+
     """
     encoder = json.JSONEncoder()
     failfast, data_list = failfast_jsonloads(request.body)

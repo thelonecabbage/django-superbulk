@@ -74,7 +74,7 @@ For the failfast version (Eg: 1000000 transactions, but it will stop after the f
            };
 
 	$.ajax({
-	   url: '/api/superbulk/',
+	   url: '/api/superbulk_transactional/',
 	   dataType: "application/json",
 	   data: JSON.stringify(data),
 	   type:'POST',
