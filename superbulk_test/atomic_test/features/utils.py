@@ -13,7 +13,7 @@ def before_all():
 def set_post_data(data):
     world.post_data = data
 
-def make_request(url, data):
+def make_request(url, data=None):
     if data:
         response = world.browser.post(url, world.post_data, content_type='application/json')
         world.response_data = response.content
