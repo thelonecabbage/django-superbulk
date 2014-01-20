@@ -1,6 +1,6 @@
 from lettuce import *
 
-from utils import *
+from utils import before_all, set_post_data, make_request
 
 @before.all
 def set_browser():

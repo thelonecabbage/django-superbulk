@@ -6,12 +6,14 @@ from urlparse import urlparse
 from django.core.urlresolvers import resolve
 from django.db import transaction
 from django.http import HttpResponse, QueryDict
+from django.views.decorators.http import require_http_methods
 
 class MultipleHTTPError(Exception):
     """Raised when transaction fails
     message: json
 
     """
+@require_http_methods(["POST"])
 def superbulk_transactional(request):
     """Executes all transactions in the request atomically
     wraps superbulk_atom call in a transaction block
@@ -102,7 +104,7 @@ def superbulk_atom(request):
         encoder.encode(res_list), content_type='application/json')
 
 
-
+@require_http_methods(["POST"])
 def superbulk(request):
     """Performs multiple transactions passed in
     from request

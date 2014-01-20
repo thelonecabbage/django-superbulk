@@ -10,9 +10,9 @@ from atomic_test.models import Invoice
 def inserts_worked(step):
     data = json.loads(world.response_data)
     for data_object in data:
-        dom = json.loads(data_object['content'])
-        customer_id = dom['customer_id']
-        invoice_no = dom['invoice_no']
+        json_obj = json.loads(data_object['content'])
+        customer_id = json_obj['customer_id']
+        invoice_no = json_obj['invoice_no']
         ok_(Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
 
 @step(r'transaction failed atomically')
