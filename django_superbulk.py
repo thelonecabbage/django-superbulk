@@ -72,17 +72,26 @@ def request_handler(request, data_list, failfast=False):
         this_request.method = data['method']
         this_request.GET = QueryDict(uri.query)
         kwargs['request'] = this_request
+        res = None
         try:
             res = view(*args, **kwargs)
         except:
             one_failed = True
-        if res.status_code >= 400:
-            one_failed = True
-        res_list.append({
-            'status_code': res.status_code,
-            'headers': res._headers,
-            'content': res.content
-        })
+        if res is not None:
+            if res.status_code >= 400:
+                one_failed = True
+            res_list.append({
+                'status_code': res.status_code,
+                'headers': res._headers,
+                'content': res.content
+            })
+        else:
+            res_list.append({
+                'status_code': 500,
+                'content': json.dumps({
+                    'reason': 'View instantiation failed'
+                })
+            })
     return one_failed, res_list
 
 
