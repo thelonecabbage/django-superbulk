@@ -8,6 +8,7 @@ from django.core.urlresolvers import resolve
 
 
 def superbulk(request):
+    """A (django)view which executes multiple views in the same request."""
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     res_list = []
