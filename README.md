@@ -51,6 +51,41 @@ Older browsers don't support all of HTTP's new verbs (PATCH is not supported by 
 	   }
 	});
 ```
+For the failfast version (Eg: 1000000 transactions, but it will stop after the first failed one)
+```javascript
+
+	data = { failfast: True,
+            content: [{
+               method:'POST',
+               uri:'/api/v1/customer/',
+               body:JSON.stringify({
+                  id: 'asdf-asdf-asdf-sadf',
+                  name: 'Justin'
+                  })
+               },{
+               method:'POST',
+               uri:'/api/v1/invoice/',
+               body:JSON.stringify({
+                  customer_id: 'asdf-asdf-asdf-sadf',
+                  invoice_no: '0001'
+                  })
+               }
+            ]
+           };
+
+	$.ajax({
+	   url: '/api/superbulk_transactional/',
+	   dataType: "application/json",
+	   data: JSON.stringify(data),
+	   type:'POST',
+	   contentType:'application/json',
+	   headers: {
+	      'X-CSRFToken': (document.cookie.match(/csrftoken=([0-9a-zA-Z]*)/) || ['']).pop()
+	   }
+	});
+```
+
+
 ## Installing:
 
 ```
@@ -58,12 +93,24 @@ Older browsers don't support all of HTTP's new verbs (PATCH is not supported by 
 git clone git@github.com:thelonecabbage/django-superbulk.git
 cd django-superbulk
 python setup.py install
+
+or another option would be to:
+
+pip install git+https://github.com/thelonecabbage/django-superbulk.git
+(Note the https form)
 ```
 
 Add this url (or any other you prefer) to your urls.py file.
 ```python
    urlpatterns += patterns('django_superbulk'
+      # this is the url for the more permissive
+      # handling where some transactions may fail but this
+      # returns a list with the results of the execution
       url(r'^api/superbulk/$', 'superbulk'),
+
+      # this will handle all the post data as a single transaction
+      url(r'^api/superbulk_transactional/$', 'superbulk-atomic'),
+
    )
 ```
 
@@ -83,4 +130,12 @@ Successfull returns return an array of objects in the same order and length subm
 }]
 ```
 
+Tests:
+    In order to run the tests you will need nose and lettuce.
+
+    They can be run with the usual:
+
+    ```
+        cd superbulk_test && python manage.py harvest
+    ```
 
