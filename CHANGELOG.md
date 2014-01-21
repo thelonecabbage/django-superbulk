@@ -5,7 +5,9 @@ Features:
  - added django test project containing integration tests
 
 ### 0.1 (14-JAN-2014) https://github.com/uberVU/django-superbulk/pull/2
+
 Features:
  - added setup to make it installable
+
 Bugs:
  - can call endpoint which has GET params
