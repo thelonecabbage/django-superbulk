@@ -9,4 +9,5 @@ setup(name="django_superbulk",
       url="http://github.com/thelonecabbage/django-superbulk",
       py_modules=['django_superbulk'],
       requires=['django'],
+      tests_require=['nose', 'lettuce'],
       keywords="django superbulk transactions")
