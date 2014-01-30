@@ -25,6 +25,7 @@ def inserts_failed(step):
             invoice_no = temp['invoice_no']
             ok_(not Invoice.objects.filter(customer_id=customer_id, invoice_no=invoice_no))
 
+
 @step(r'transaction stops after first failure')
 def insert_failed_break(step):
     data = json.loads(world.response_data)
