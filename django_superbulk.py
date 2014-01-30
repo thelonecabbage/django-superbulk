@@ -122,6 +122,7 @@ def superbulk(request):
             transactions
 
     """
+    raise Exception("FAIL")
     encoder = json.JSONEncoder()
     data_list = json.loads(request.body)
     one_failed, res_list = request_handler(request, data_list)
