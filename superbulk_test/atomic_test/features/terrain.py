@@ -2,6 +2,14 @@ from lettuce import *
 
 from utils import before_all, set_post_data, make_request
 
+
+
+
+
+@after.harvest
+def delete_db(vars):
+    pass
+
 @before.all
 def set_browser():
     before_all()
