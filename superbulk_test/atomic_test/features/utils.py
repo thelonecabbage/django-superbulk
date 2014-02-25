@@ -3,15 +3,19 @@ from lettuce import *
 
 from atomic_test.models import Invoice
 
+
 def clean_db():
     Invoice.objects.all().delete()
+
 
 def before_all():
     clean_db()
     world.browser = Client()
 
+
 def set_post_data(data):
     world.post_data = data
+
 
 def make_request(url, data=None):
     if data:
