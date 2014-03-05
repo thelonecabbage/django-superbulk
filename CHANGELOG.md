@@ -1,10 +1,10 @@
-### 0.2 (21-JAN-2014) https://github.com/uberVU/django-superbulk/pull/4
+### 0.2 (21-JAN-2014) https://github.com/thelonecabbage/django-superbulk/pull/4
 
 Features:
  - added superbulk_transactional (atomic bulk requests) 
  - added django test project containing integration tests
 
-### 0.1 (14-JAN-2014) https://github.com/uberVU/django-superbulk/pull/2
+### 0.1 (14-JAN-2014) https://github.com/thelonecabbage/django-superbulk/pull/2
 
 Features:
  - added setup to make it installable
